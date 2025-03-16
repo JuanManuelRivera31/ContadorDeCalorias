@@ -1,14 +1,21 @@
-import { useState, ChangeEvent, FormEvent } from "react"
+import { useState, ChangeEvent, FormEvent, Dispatch } from "react"
 import { Activity } from "../types"
 import { categories } from "../data/categories"
+import { ActivityActions } from "../reducers/activity-reducer"
 
-export default function Form() {
+type FormProps = {
+    dispatch: Dispatch<ActivityActions> //Le pasamos las acciones
+}
+
+const initialState = {
+    category: 1,    
+    name: '',
+    calories: 0 
+}
+
+export default function Form({dispatch} : FormProps) { //Extraemos para usarlo en nuestro componente
   
-    const [activity, setActivity] = useState<Activity>({
-        category: 2,
-        name: '',
-        calories: 0 
-    })
+    const [activity, setActivity] = useState<Activity>(initialState)
 
     const handleChange = (e: ChangeEvent<HTMLSelectElement> | ChangeEvent<HTMLInputElement>) => {
         const isNumberField= ['category', 'calories'].includes(e.target.id)//True si el campo es category o calories
@@ -26,12 +33,17 @@ export default function Form() {
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log(activity)
+        
+        dispatch({ type: 'save-activity', payload: {newActivity: activity}}) //Enviamos la acción al reducer
+        // setActivity({ category: 1, name: '', calories: 0 }) //Limpiamos el formulario
+    
+        setActivity(initialState)
     }
 
     return (
-    <form className="space-y-5 bg-white shadow p-10 rounded-lg"
-    onSubmit={handleSubmit}
+    <form
+        className="space-y-5 bg-white shadow p-10 rounded-lg"
+        onSubmit={handleSubmit}
     >
 
     <div className="grid grid-cols-1 gap-3">
